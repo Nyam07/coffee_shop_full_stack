@@ -9,7 +9,7 @@ from .auth.auth import AuthError, requires_auth
 
 app = Flask(__name__)
 setup_db(app)
-CORS(app)
+CORS(app) 
 
 '''
 @TODO uncomment the following line to initialize the datbase
@@ -17,7 +17,7 @@ CORS(app)
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 !! Running this funciton will add one
 '''
-# db_drop_and_create_all()
+#db_drop_and_create_all()
 
 # ROUTES
 '''
@@ -28,6 +28,21 @@ CORS(app)
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks')
+def get_drinks():
+    try:
+        all_drinks = Drink.query.order_by(Drink.id).all()
+        drinks = [drink.short() for drink in all_drinks]
+
+        return jsonify({
+            'staus_code': 200,
+            'success': True,
+            'drinks': drinks,
+            
+        })
+    except Exception as e:
+        print(e)
+        abort(404)
 
 
 '''

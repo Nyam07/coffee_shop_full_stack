@@ -11,7 +11,7 @@ API_AUDIENCE = 'dev'
 
 ## AuthError Exception
 '''
-AuthError Exception
+AuthError Exception 
 A standardized way to communicate auth failure modes
 '''
 class AuthError(Exception):
