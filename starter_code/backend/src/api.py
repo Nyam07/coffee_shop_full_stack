@@ -93,12 +93,7 @@ def add_drink():
         new_title = body.get('title', None)
         new_recipe = body.get('recipe', None)
 
-        new_recipe_str = str(new_recipe)
-
-        print("NEW RECIPE", new_recipe_str)
-        print("TYPE", type(new_recipe_str))
-
-        new_drink = Drink(title=new_title, recipe=str(new_recipe))
+        new_drink = Drink(title=new_title, recipe=json.dumps(new_recipe))
 
         new_drink.insert()
 
