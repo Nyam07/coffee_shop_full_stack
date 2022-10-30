@@ -9,7 +9,7 @@ from .auth.auth import AuthError, requires_auth
 
 app = Flask(__name__)
 setup_db(app)
-CORS(app) 
+CORS(app)
 
 '''
 @TODO uncomment the following line to initialize the datbase
@@ -28,6 +28,8 @@ CORS(app)
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
+
+
 @app.route('/drinks')
 def get_drinks():
     try:
@@ -38,7 +40,7 @@ def get_drinks():
             'staus_code': 200,
             'success': True,
             'drinks': drinks,
-            
+
         })
     except Exception as e:
         print(e)
@@ -53,10 +55,13 @@ def get_drinks():
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
+
+
 @app.route('/drinks-detail')
 def get_drink_details():
     try:
         all_drinks = Drink.query.order_by(Drink.id).all()
+        print(all_drinks)
         drinks = [drink.long() for drink in all_drinks]
 
         return jsonify({
@@ -69,6 +74,7 @@ def get_drink_details():
         print(e)
         abort(404)
 
+
 '''
 @TODO implement endpoint
     POST /drinks
@@ -78,6 +84,33 @@ def get_drink_details():
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
+
+
+@app.route('/drinks', methods=['POST'])
+def add_drink():
+    try:
+        body = request.json
+        new_title = body.get('title', None)
+        new_recipe = body.get('recipe', None)
+
+        new_recipe_str = str(new_recipe)
+
+        print("NEW RECIPE", new_recipe_str)
+        print("TYPE", type(new_recipe_str))
+
+        new_drink = Drink(title=new_title, recipe=str(new_recipe))
+
+        new_drink.insert()
+
+        return jsonify({
+            'status_code': 200,
+            'success': True,
+            'drinks': new_drink.long(),
+        })
+
+    except Exception as e:
+        print(e)
+        abort(404)
 
 
 '''
@@ -93,6 +126,36 @@ def get_drink_details():
 '''
 
 
+@app.route('/drinks/<int:drink_id>', methods=['PATCH'])
+def edit_drink(drink_id):
+    try:
+        body = request.json
+        new_title = body.get('title', None)
+        new_recipe = body.get('recipe', None)
+
+        drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
+
+        if drink is None:
+            abort(404)
+
+        if new_title is not None:
+            drink.title = new_title
+        if new_recipe is not None:
+            drink.recipe = new_recipe
+
+        drink.update()
+
+        return jsonify({
+            'success': True,
+            'status_code': 200,
+            'drink': drink.long(),
+        })
+
+    except Exception as e:
+        print(e)
+        abort(404)
+
+
 '''
 @TODO implement endpoint
     DELETE /drinks/<id>
@@ -103,6 +166,26 @@ def get_drink_details():
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
+
+
+@app.route('/drinks/<int:drink_id>', methods=['DELETE'])
+def delete_drink(drink_id):
+    try:
+        drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
+
+        if drink is None:
+            abort(404)
+
+        drink.delete()
+
+        return jsonify({
+            'success': True,
+            'status_code': 200,
+            'delete': drink_id,
+        })
+    except Exception as e:
+        print(e)
+        abort(404)
 
 
 # Error Handling
@@ -137,7 +220,25 @@ def unprocessable(error):
 '''
 
 
+@app.errorhandler(404)
+def unprocessable(error):
+    return jsonify({
+        "success": False,
+        "error": 404,
+        "message": "Not Found"
+    }), 404
+
+
 '''
 @TODO implement error handler for AuthError
     error handler should conform to general task above
 '''
+
+
+@app.errorhandler(401)
+def unprocessable(error):
+    return jsonify({
+        "success": False,
+        "error": 401,
+        "message": "Authentication error"
+    }), 401
