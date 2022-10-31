@@ -56,9 +56,9 @@ def get_drinks():
         or appropriate status code indicating reason for failure
 '''
 
-
 @app.route('/drinks-detail')
-def get_drink_details():
+@requires_auth('get:drinks-detail')
+def get_drink_details(payload):
     try:
         all_drinks = Drink.query.order_by(Drink.id).all()
         print(all_drinks)
@@ -87,7 +87,8 @@ def get_drink_details():
 
 
 @app.route('/drinks', methods=['POST'])
-def add_drink():
+@requires_auth('post:drinks')
+def add_drink(payload):
     try:
         body = request.json
         new_title = body.get('title', None)
@@ -122,7 +123,8 @@ def add_drink():
 
 
 @app.route('/drinks/<int:drink_id>', methods=['PATCH'])
-def edit_drink(drink_id):
+@requires_auth('patch:drinks')
+def edit_drink(payload, drink_id):
     try:
         body = request.json
         new_title = body.get('title', None)
@@ -164,7 +166,8 @@ def edit_drink(drink_id):
 
 
 @app.route('/drinks/<int:drink_id>', methods=['DELETE'])
-def delete_drink(drink_id):
+@requires_auth('delete:drinks')
+def delete_drink(payload, drink_id):
     try:
         drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
 
