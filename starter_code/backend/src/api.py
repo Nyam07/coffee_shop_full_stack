@@ -133,9 +133,9 @@ def edit_drink(drink_id):
         if drink is None:
             abort(404)
 
-        if new_title is not None:
+        if new_title:
             drink.title = new_title
-        if new_recipe is not None:
+        if new_recipe:
             drink.recipe = new_recipe
 
         drink.update()
