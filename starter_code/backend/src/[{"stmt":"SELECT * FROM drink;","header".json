@@ -1,1 +1,0 @@
-[{"stmt":"SELECT * FROM drink;","header":["id","title","recipe"],"rows":[["1","water","[{\"name\": \"water\", \"color\": \"blue\", \"parts\": 1}]"],["2","soda","[{'name': 'soda', 'color': 'orange', 'parts': 2}]"]]}]
