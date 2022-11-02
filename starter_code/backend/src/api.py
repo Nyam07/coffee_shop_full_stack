@@ -94,6 +94,9 @@ def add_drink(payload):
         new_title = body.get('title', None)
         new_recipe = body.get('recipe', None)
 
+        if isinstance(new_recipe, dict):
+            new_recipe = [new_recipe]
+
         new_drink = Drink(title=new_title, recipe=json.dumps(new_recipe))
 
         new_drink.insert()
@@ -124,7 +127,7 @@ def add_drink(payload):
 
 @app.route('/drinks/<int:drink_id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
-def edit_drink(payload, drink_id):
+def edit_drink(payload, drink_id): 
     try:
         body = request.json
         new_title = body.get('title', None)
@@ -138,14 +141,14 @@ def edit_drink(payload, drink_id):
         if new_title:
             drink.title = new_title
         if new_recipe:
-            drink.recipe = new_recipe
+            drink.recipe = json.dumpd(new_recipe)
 
         drink.update()
 
         return jsonify({
             'success': True,
             'status_code': 200,
-            'drink': drink.long(),
+            'drinks': [drink.long()],
         })
 
     except Exception as e:
@@ -240,3 +243,12 @@ def unprocessable(error):
         "error": 401,
         "message": "Authentication error"
     }), 401
+
+
+@app.errorhandler(403)
+def unprocessable(error):
+    return jsonify({
+        "success": False,
+        "error": 403,
+        "message": "Permission not found"
+    }), 403

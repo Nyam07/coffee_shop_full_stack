@@ -1,5 +1,5 @@
 import json
-from flask import request, _request_ctx_stack
+from flask import request, _request_ctx_stack, abort
 from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
@@ -34,7 +34,7 @@ def get_token_auth_header():
     auth = request.headers.get('Authorization', None)
 
     if not auth:
-        raise Autherror({
+        raise AuthError({
             'code': 'authorization_header_missing',
             'description': 'Authorization header expected'
         }, 401)
@@ -77,16 +77,10 @@ def get_token_auth_header():
 '''
 def check_permissions(permission, payload):
     if 'permissions' not in payload:
-        raise AuthError({
-            'code': 'invalid_request',
-            'description': 'permissions should be included in the payload'
-        }, 401)
+        abort(400)
     
     if permission not in payload['permissions']:
-        raise AuthError({
-            'code':'invalid_permission',
-            'description':'user does not have permission to access this resource'
-        })
+        abort(403)
     
     return True
 
@@ -156,7 +150,7 @@ def verify_decode_jwt(token):
                 'description': 'Unable to find the appropriate key.'
     }, 400)
 
-'''
+''' 
 @TODO implement @requires_auth(permission) decorator method
     @INPUTS
         permission: string permission (i.e. 'post:drink')
