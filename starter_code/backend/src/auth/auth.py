@@ -6,9 +6,9 @@ from jose import jwt
 from urllib.request import urlopen
 
 
-AUTH0_DOMAIN = environ.get(AUTH0_DOMAIN, 'ngatia.us.auth0.com')
+AUTH0_DOMAIN = environ.get('AUTH0_DOMAIN', 'ngatia.us.auth0.com')
 ALGORITHMS = ['RS256']
-API_AUDIENCE =environ.get(API_AUDIENCE, 'coffee_shop')
+API_AUDIENCE =environ.get('API_AUDIENCE', 'coffee_shop')
 
 ## AuthError Exception
 '''
