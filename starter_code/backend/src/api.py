@@ -17,7 +17,7 @@ CORS(app)
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 !! Running this funciton will add one
 '''
-#db_drop_and_create_all()
+db_drop_and_create_all()
 
 # ROUTES
 '''
@@ -141,7 +141,7 @@ def edit_drink(payload, drink_id):
         if new_title:
             drink.title = new_title
         if new_recipe:
-            drink.recipe = json.dumpd(new_recipe)
+            drink.recipe = json.dumps(new_recipe)
 
         drink.update()
 
@@ -252,3 +252,12 @@ def unprocessable(error):
         "error": 403,
         "message": "Permission not found"
     }), 403
+
+@app.errorhandler(AuthError)
+def handle_auth_error(auth_err):
+    """
+    Receive the raised authorization error and propagates it as response
+    """
+    response = jsonify(auth_err.error)
+    response.status_code = auth_err.status_code
+    return response
